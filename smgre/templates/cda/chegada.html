@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>SMGRE Poupando seu tempo</title>
+</head>
+<body>
+	<script src="/site_media/js/jquery-1.8.2.min.js"></script>
+	<h1>Os estabelecimentos e atividades<h1>
+	<h2>Escolha seu estabelecimento:<h2>
+	<select id="estabelecimentos" name="estabelecimentos">
+		<option value="">escolha o local</option>
+		{% for estabelecimento in estabelecimentos %}
+			<option value="{{ estabelecimento.id_estabelecimento }}">{{ estabelecimento.nome }}</option>
+		{% endfor %}
+	</select>
+	<h2>Escolha sua atividade:</h2>
+	<select id="vantagens" name="vantagens">
+		<option value="">escolha o local</option>
+	</select>
+
+	<span class="buscar-vaga">Buscar vaga</span>
+
+	<script>
+		function preencheComboVantagem(lista) {
+			// preenche o combo dado uma lista de palavras
+			var comboVantagem = jQuery('#vantagens');
+			if (lista.length > 0)
+				var valor_anterior = comboVantagem.val();
+			comboVantagem.find('option')
+		    .remove();
+		    comboVantagem.append('<option value="">escolha o local</option>');
+			jQuery.each(lista, function(){
+				comboVantagem.append('<option value="' + this.id + '">' + this.nome + '</option>');
+			});
+		}
+
+		jQuery('#estabelecimentos').change(function() {
+				var select_estabelecimento = (jQuery("#"+this.id+""));
+				var estabelecimento_id = select_estabelecimento.val();
+				var url = '/vantagens/estacionamento/' + estabelecimento_id;
+				jQuery.getJSON(url, function(data){
+					preencheComboVantagem(data);
+				});
+		});
+
+		jQuery('.buscar-vaga').click(function() {
+			var vantagem = jQuery('#vantagens').val();
+			var url = '/vagas/mapa/vantagem/' + vantagem;
+			parent.location.href = url; 
+		});
+	</script>
+</body>
+</html>

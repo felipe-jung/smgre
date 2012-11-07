@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Mapa do projeto final</title>
+</head>
+<body>
+	{% if url_para_pagar %}
+		<div class='pagar'><a href="{{ url_para_pagar }}">Estou de saida<a></div>
+	{% endif %}
+	<div id="map"></div>
+	<style type="text/css">
+	body {
+	    padding: 0;
+	    margin: 0;
+	}
+	html, body, #map {
+	    height: 100%;
+	}
+
+	</style>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+	<!--[if lte IE 8]>
+	 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
+	<![endif]-->
+	<div id="cm-example" style="width: 500px; height: 500px"></div>
+	<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+
+	<script>
+		var map = L.map('map');
+
+		var layer = L.tileLayer('/site_media/mapas/{z}/{x}/{y}.png', {
+			maxZoom: 2,
+			attribution: 'Tudo meu',
+			tms: true,
+			noWrap: true,
+			zoom: 1
+		}).addTo(map);
+		var latlngs = [
+						{% for no in nos %}
+						[ {{ no.longitude }} , {{ no.latitude }} ],
+					    {% endfor %}
+					  ]
+		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+		{% with nos|last as vaga %}
+			var marker = L.marker([{{ vaga.longitude }} , {{ vaga.latitude }} ]).addTo(map);
+		{% endwith %}
+
+		// zoom the map to the polyline
+		// map.fitBounds(polyline.getBounds());
+
+		function onLocationFound(e) {
+			// var radius = e.accuracy / 2;
+
+			// L.marker(e.latlng).addTo(map)
+			// 	.bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+			// L.circle(e.latlng, radius).addTo(map);
+		}
+
+		function onLocationError(e) {
+			// alert(e.message);
+		}
+
+		map.on('locationfound', onLocationFound);
+		map.on('locationerror', onLocationError);
+
+		map.locate({setView: true, maxZoom: 2});
+	</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`pessoa`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`pessoa` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(45) NOT NULL ,
+  `endereco` VARCHAR(45) NOT NULL ,
+  `data_nascimento` DATE NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`responsavel`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`responsavel` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `pessoa_id` INT NULL ,
+  `cargo` VARCHAR(45) NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `pessoa_id_idx` (`pessoa_id` ASC) ,
+  CONSTRAINT `pessoa_id`
+    FOREIGN KEY (`pessoa_id` )
+    REFERENCES `smgre`.`pessoa` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`tipo_vaga`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`tipo_vaga` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`status_da_vaga`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`status_da_vaga` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(45) NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`estabelecimento`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`estabelecimento` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(45) NOT NULL ,
+  `entrada` INT NULL ,
+  `saida` INT NULL ,
+  `endereco` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`vaga`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`vaga` (
+  `id` INT NOT NULL ,
+  `posicao` VARCHAR(45) NULL ,
+  `tipo_vaga` INT NULL ,
+  `estabelecimento` INT NULL ,
+  `vantagem_vaga` INT NULL ,
+  `status` INT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `tipo_vaga_idx` (`tipo_vaga` ASC) ,
+  INDEX `status_idx` (`status` ASC) ,
+  INDEX `estabelecimento_idx` (`estabelecimento` ASC) ,
+  INDEX `vantagem_vaga_idx` () ,
+  CONSTRAINT `tipo_vaga`
+    FOREIGN KEY (`tipo_vaga` )
+    REFERENCES `smgre`.`tipo_vaga` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `status`
+    FOREIGN KEY (`status` )
+    REFERENCES `smgre`.`status_da_vaga` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `estabelecimento`
+    FOREIGN KEY (`estabelecimento` )
+    REFERENCES `smgre`.`estabelecimento` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`cativa`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`cativa` (
+  `id` INT NOT NULL ,
+  `pessoa_id` INT NULL ,
+  `vaga` INT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `pessoa_id_idx` (`pessoa_id` ASC) ,
+  INDEX `vaga_idx` (`vaga` ASC) ,
+  CONSTRAINT `pessoa_id`
+    FOREIGN KEY (`pessoa_id` )
+    REFERENCES `smgre`.`pessoa` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `vaga`
+    FOREIGN KEY (`vaga` )
+    REFERENCES `smgre`.`vaga` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`tarifa`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`tarifa` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `preco_inicial` DOUBLE NOT NULL ,
+  `carencia` INT NOT NULL ,
+  `preco_hora_adicional` DOUBLE NOT NULL ,
+  `tipo_vaga` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `tipo_vaga_idx` (`tipo_vaga` ASC) ,
+  CONSTRAINT `tipo_vaga`
+    FOREIGN KEY (`tipo_vaga` )
+    REFERENCES `smgre`.`tipo_vaga` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`tipo_vantagem`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`tipo_vantagem` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(45) NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`grau_vantagem`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`grau_vantagem` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `grau` VARCHAR(45) NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `smgre`.`atividade`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `smgre`.`atividade` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `pessoa` INT NULL ,
+  `entrada` DATETIME NULL ,
+  `saida` DATETIME NULL ,
+  `vaga` INT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `vaga_idx` (`vaga` ASC) ,
+  INDEX `pessoa_idx` (`pessoa` ASC) ,
+  CONSTRAINT `vaga`
+    FOREIGN KEY (`vaga` )
+    REFERENCES `smgre`.`vaga` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `pessoa`
+    FOREIGN KEY (`pessoa` )
+    REFERENCES `smgre`.`pessoa` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
